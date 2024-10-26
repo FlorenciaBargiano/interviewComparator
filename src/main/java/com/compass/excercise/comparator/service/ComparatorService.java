@@ -10,7 +10,7 @@ import java.util.List;
 @Service
 @AllArgsConstructor
 public class ComparatorService {
-    private static final String[] RESULT_HEADERS = new String[] { "ContactID Source", "ContactID Match", "Accuracy" };
+    private static final String[] RESULT_HEADERS = new String[] { "ContactID Source", "ContactID Match", "Result", "Accuracy" };
 
 
     /*
@@ -30,7 +30,7 @@ public class ComparatorService {
     */
     public void processContactInformation() {
         //Step 1
-        System.out.println("Initiating the process of the contact information");
+        System.out.println("Initiating to compare contact information");
         List<String[]> contactInformation = processDataService.obtainContactInformation();
 
         //Step 2
@@ -75,6 +75,7 @@ public class ComparatorService {
 
                 comparatorResult.add(new String[]{ String.valueOf(i),
                                                    String.valueOf(j),
+                                                   String.valueOf(result),
                                                    defineAccuracy(result)});
                 //Initialize again the result
                 result = 0;
@@ -85,13 +86,16 @@ public class ComparatorService {
     }
 
     private String defineAccuracy(double resultComparator) {
-        if(resultComparator == 0){
+        if (resultComparator == 0.0) {
             return "Equal";
-        } else if (resultComparator > 3) {
+        } else if ( resultComparator >= 3.0) {
             return "Low";
+        } else if (resultComparator > 2) {
+            return "Medium";
+        } else if (resultComparator <= 2) {
+            return "High";
         }
-
-        return "High";
+        return "Error";
     }
 
     private int returnMinor(int contactSourceSize, int contactMatchSize) {
