@@ -20,7 +20,7 @@ public class ProcessDataService {
 
     private static final String COMMA_SEPARATOR = ",";
     private static final String BASE_SOURCE = "./src/main/resources/files";
-    private static final String INPUT_SOURCE = "/files/duplicates.csv";
+    private static final String INPUT_SOURCE = "/duplicates.csv";
     private static final String OUTPUT_SOURCE = "/contactComparatorResult.csv";
 
 
