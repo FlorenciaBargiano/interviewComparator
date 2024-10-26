@@ -4,102 +4,101 @@ import com.github.wslf.levenshteindistance.LevenshteinCalculator;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
+
+import static service.ProcessDataService.convertContactComparatorIntoACSVFile;
+import static service.ProcessDataService.obtainContactInformation;
 
 @Service
 @AllArgsConstructor
 public class ComparatorService {
 
-    public static void convertFileIntoList() {
-        //TODO the logic of getting data has to be in a different service
-        String filePath = "./src/main/resources/files/duplicates.csv";
-        List<String[]> data = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                //The delimiter in the file used between words is a comma
-                String[] values = line.split(",");
-                data.add(values);
-            }
-        } catch (IOException e) {
-            System.out.println("An error happen when trying to read the file");
-        }
+    /*
+        The idea is to make the logic of getting the information from and
+        converting the information into a CSV file completely independent
+        of the process of the data. Doing so, we allow in the future to
+        add new sources, and it will not affect this service
+    */
+    private final ProcessDataService processDataService;
 
-        compareStrings(data);
+    /*
+          ----- Comparator Logic ----
+          We can divide the process required into these steps:
+          Step 1 > Obtain Contact Data from CSV
+          Step 2 > Compare Contact Information
+          Step 3 > Convert the result into a CSV file
+    */
+    public static void processContactInformation() {
+        //Step 1
+        List<String[]> contactInformation = obtainContactInformation();
+
+        //Step 2
+        List<String[]> contactInformationCompared = compareContactInformation(contactInformation);
+
+        //Step 3
+        convertContactComparatorIntoACSVFile(contactInformationCompared);
     }
 
-    public static void compareStrings(List<String[]> data) {
-        DecimalFormat df = new DecimalFormat("###.000", new DecimalFormatSymbols(Locale.US));
+    private static List<String[]> compareContactInformation(List<String[]> contactInformation) {
+
+        //TODO determine if we use this dependency or create ours method
         LevenshteinCalculator calculator = new LevenshteinCalculator();
-        double contador = 0;
+        double result = 0;
+
+        //This lines below defines the structure of the CSV we obtain as a result
         List<String[]> dataLines = new ArrayList<>();
-        dataLines.add(new String[]
-                { "Id1", "Id2", "Result", "Decision" });
+        dataLines.add(new String[] { "ContactID Source", "ContactID Match", "Accuracy" });
 
-        //TODO borrar
-        //TODO ver que tenemos contador, resultado
-        //dataLines.add(new String[]
-           //     { "John", "Doe", "38", "Comment Data\nAnother line of comment data" });
+        //Contact-Source Elements: We avoid calling to i = 0 because it represents the Headers of the CSV
+        for (int i = 1; i < contactInformation.size(); i++) {
 
-        for (int i = 1; i < data.size(); i++) {
-            for (int j = i + 1; j < data.size(); j++) {
-                int valor = returnMinor(data.get(i).length, data.get(j).length);
+            /* Contact-Match Elements. These are the comparator elements so we begin
+                from the (source-element + 1) */
+            for (int j = (i + 1); j < contactInformation.size(); j++) {
+
+                /*
+                    This method became necessary because we don't always have all the elements
+                    in the CSV so if any of them (source or match) has null elements it will not be
+                    considered
+                */
+                int valor = returnMinor(contactInformation.get(i).length,
+                                        contactInformation.get(j).length);
+
                 for (int k = 1; k < valor; k++) {
-                    double resultado = calculator.getDifference(data.get(i)[k], data.get(j)[k]);
+                    double partialResult = calculator.getDifference(contactInformation.get(i)[k],
+                                                                    contactInformation.get(j)[k]);
 
-                    contador = resultado + contador;
-
-                    dataLines.add(new String[]
-                               { data.get(i)[0], data.get(j)[0], String.valueOf(df.format(contador)), defineDecision(contador) });
+                    result += partialResult;
                 }
 
-                contador = 0;
+                //TODO change the name dataLines
+                dataLines.add(new String[]{ String.valueOf(i),
+                                            String.valueOf(j),
+                                            defineAccuracy(result)});
+                //Initialize again the result
+                result = 0;
 
             }
         }
-        convertingToCSV(dataLines);
+        return dataLines;
     }
 
-    //TODO apply switch?
-    private static String defineDecision(double contador) {
-        if(contador == 0){
+    private static String defineAccuracy(double resultComparator) {
+        if(resultComparator == 0){
             return "Equal";
-        } else if (contador>3) {
-            return "Distinct";
+        } else if (resultComparator > 3) {
+            return "Low";
         }
 
-        return "Similar";
-
+        return "High";
     }
 
+    private static int returnMinor(int contactSourceSize, int contactMatchSize) {
+        if (contactSourceSize == contactMatchSize || contactSourceSize < contactMatchSize)
+            return contactSourceSize;
 
-    public static int returnMinor(int value1, int value2) {
-        if (value1 == value2 || value1 < value2)
-            return value1;
-
-        return value2;
+        return contactMatchSize;
     }
-
-    //TODO rename
-    public static void convertingToCSV(List<String[]>  dataLines) {
-        File csvOutputFile = new File("./src/main/resources/files/resultado.csv");
-        try (PrintWriter pw = new PrintWriter(csvOutputFile)) {
-            dataLines.stream()
-                    .map(ComparatorService::convertToCSV)
-                    .forEach(pw::println);
-        } catch (FileNotFoundException e){
-            System.out.println("The file was not found: " + e);
-        }
-    }
-
-    public static String convertToCSV(String[] data) {
-        return String.join(",", data);
-    }
-
 
 }

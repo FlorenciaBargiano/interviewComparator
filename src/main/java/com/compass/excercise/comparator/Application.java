@@ -7,7 +7,7 @@ import service.ComparatorService;
 public class Application {
 
 	public static void main(String[] args)  {
-		ComparatorService.convertFileIntoList();
+		ComparatorService.processContactInformation();
 		//SpringApplication.run(Application.class, args);
 	}
 
