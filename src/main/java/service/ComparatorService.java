@@ -10,6 +10,8 @@ import java.util.List;
 @Service
 @AllArgsConstructor
 public class ComparatorService {
+    private static final String[] RESULT_HEADERS = new String[] { "ContactID Source", "ContactID Match", "Accuracy" };
+
 
     /*
         The idea is to make the logic of getting the information from and
@@ -45,7 +47,7 @@ public class ComparatorService {
 
         //This lines below defines the structure of the CSV we obtain as a result
         List<String[]> comparatorResult = new ArrayList<>();
-        comparatorResult.add(new String[] { "ContactID Source", "ContactID Match", "Accuracy" });
+        comparatorResult.add(RESULT_HEADERS);
 
         //Contact-Source Elements: We avoid calling to i = 0 because it represents the Headers of the CSV
         for (int i = 1; i < contactInformation.size(); i++) {

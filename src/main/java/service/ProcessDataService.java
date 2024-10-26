@@ -21,6 +21,7 @@ public class ProcessDataService {
     private static final String INPUT_SOURCE = "/duplicates.csv";
     private static final String OUTPUT_SOURCE = "/contactComparatorResult.csv";
 
+
     public List<String[]> obtainContactInformation() {
         String fileLocation = BASE_SOURCE+INPUT_SOURCE;
         List<String[]> contactsInformation = new ArrayList<>();
@@ -32,8 +33,7 @@ public class ProcessDataService {
                 contactsInformation.add(contactInformation);
             }
         } catch (IOException e) {
-            //TODO add a specific error
-            System.out.println("An error happen when trying to read the file");
+            System.out.println("An error happened when trying to read from the file");
         }
         return contactsInformation;
     }
@@ -48,8 +48,7 @@ public class ProcessDataService {
                     .map(data -> String.join(COMMA_SEPARATOR, data))
                     .forEach(pw::println);
         } catch (FileNotFoundException e){
-            //TODO add a specific error
-            System.out.println("The file was not found: " + e);
+            System.out.println("The output file was not found: " + e);
         }
     }
 
