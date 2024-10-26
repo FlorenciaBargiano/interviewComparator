@@ -3,7 +3,12 @@ package service;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +21,7 @@ public class ProcessDataService {
     private static final String INPUT_SOURCE = "/duplicates.csv";
     private static final String OUTPUT_SOURCE = "/contactComparatorResult.csv";
 
-    public static List<String[]> obtainContactInformation() {
+    public List<String[]> obtainContactInformation() {
         String fileLocation = BASE_SOURCE+INPUT_SOURCE;
         List<String[]> contactsInformation = new ArrayList<>();
 
@@ -34,7 +39,7 @@ public class ProcessDataService {
     }
 
 
-    public static void convertContactComparatorIntoACSVFile(List<String[]>  dataLines) {
+    public void convertContactComparatorIntoACSVFile(List<String[]>  dataLines) {
         String fileLocation = BASE_SOURCE+OUTPUT_SOURCE;
 
         File csvOutputFile = new File(fileLocation);

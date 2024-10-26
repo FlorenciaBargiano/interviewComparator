@@ -7,9 +7,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
-import static service.ProcessDataService.convertContactComparatorIntoACSVFile;
-import static service.ProcessDataService.obtainContactInformation;
-
 @Service
 @AllArgsConstructor
 public class ComparatorService {
@@ -29,26 +26,26 @@ public class ComparatorService {
           Step 2 > Compare Contact Information
           Step 3 > Convert the result into a CSV file
     */
-    public static void processContactInformation() {
+    public void processContactInformation() {
         //Step 1
-        List<String[]> contactInformation = obtainContactInformation();
+        List<String[]> contactInformation = processDataService.obtainContactInformation();
 
         //Step 2
         List<String[]> contactInformationCompared = compareContactInformation(contactInformation);
 
         //Step 3
-        convertContactComparatorIntoACSVFile(contactInformationCompared);
+        processDataService.convertContactComparatorIntoACSVFile(contactInformationCompared);
     }
 
-    private static List<String[]> compareContactInformation(List<String[]> contactInformation) {
+    private List<String[]> compareContactInformation(List<String[]> contactInformation) {
 
         //TODO determine if we use this dependency or create ours method
         LevenshteinCalculator calculator = new LevenshteinCalculator();
         double result = 0;
 
         //This lines below defines the structure of the CSV we obtain as a result
-        List<String[]> dataLines = new ArrayList<>();
-        dataLines.add(new String[] { "ContactID Source", "ContactID Match", "Accuracy" });
+        List<String[]> comparatorResult = new ArrayList<>();
+        comparatorResult.add(new String[] { "ContactID Source", "ContactID Match", "Accuracy" });
 
         //Contact-Source Elements: We avoid calling to i = 0 because it represents the Headers of the CSV
         for (int i = 1; i < contactInformation.size(); i++) {
@@ -72,8 +69,8 @@ public class ComparatorService {
                     result += partialResult;
                 }
 
-                //TODO change the name dataLines
-                dataLines.add(new String[]{ String.valueOf(i),
+                //TODO change the name comparatorResult
+                comparatorResult.add(new String[]{ String.valueOf(i),
                                             String.valueOf(j),
                                             defineAccuracy(result)});
                 //Initialize again the result
@@ -81,10 +78,10 @@ public class ComparatorService {
 
             }
         }
-        return dataLines;
+        return comparatorResult;
     }
 
-    private static String defineAccuracy(double resultComparator) {
+    private String defineAccuracy(double resultComparator) {
         if(resultComparator == 0){
             return "Equal";
         } else if (resultComparator > 3) {
@@ -94,7 +91,7 @@ public class ComparatorService {
         return "High";
     }
 
-    private static int returnMinor(int contactSourceSize, int contactMatchSize) {
+    private int returnMinor(int contactSourceSize, int contactMatchSize) {
         if (contactSourceSize == contactMatchSize || contactSourceSize < contactMatchSize)
             return contactSourceSize;
 
