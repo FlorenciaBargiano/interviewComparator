@@ -1,4 +1,4 @@
-package service;
+package com.compass.excercise.comparator.service;
 
 import com.github.wslf.levenshteindistance.LevenshteinCalculator;
 import lombok.AllArgsConstructor;
@@ -30,6 +30,7 @@ public class ComparatorService {
     */
     public void processContactInformation() {
         //Step 1
+        System.out.println("Initiating the process of the contact information");
         List<String[]> contactInformation = processDataService.obtainContactInformation();
 
         //Step 2
@@ -37,11 +38,11 @@ public class ComparatorService {
 
         //Step 3
         processDataService.convertContactComparatorIntoACSVFile(contactInformationCompared);
+        System.out.println("The process ended successfully, the file was created/updated (if already existed)");
     }
 
     private List<String[]> compareContactInformation(List<String[]> contactInformation) {
 
-        //TODO determine if we use this dependency or create ours method
         LevenshteinCalculator calculator = new LevenshteinCalculator();
         double result = 0;
 
@@ -71,10 +72,10 @@ public class ComparatorService {
                     result += partialResult;
                 }
 
-                //TODO change the name comparatorResult
+
                 comparatorResult.add(new String[]{ String.valueOf(i),
-                                            String.valueOf(j),
-                                            defineAccuracy(result)});
+                                                   String.valueOf(j),
+                                                   defineAccuracy(result)});
                 //Initialize again the result
                 result = 0;
 

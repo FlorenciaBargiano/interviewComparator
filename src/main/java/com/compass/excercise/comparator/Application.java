@@ -1,8 +1,8 @@
 package com.compass.excercise.comparator;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import service.ComparatorService;
-import service.ProcessDataService;
+import com.compass.excercise.comparator.service.ComparatorService;
+import com.compass.excercise.comparator.service.ProcessDataService;
 
 @SpringBootApplication
 public class Application {

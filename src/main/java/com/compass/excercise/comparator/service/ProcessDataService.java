@@ -1,5 +1,6 @@
-package service;
+package com.compass.excercise.comparator.service;
 
+import com.compass.excercise.comparator.error.ErrorDetail;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -9,6 +10,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +20,7 @@ public class ProcessDataService {
 
     private static final String COMMA_SEPARATOR = ",";
     private static final String BASE_SOURCE = "./src/main/resources/files";
-    private static final String INPUT_SOURCE = "/duplicates.csv";
+    private static final String INPUT_SOURCE = "/files/duplicates.csv";
     private static final String OUTPUT_SOURCE = "/contactComparatorResult.csv";
 
 
@@ -33,7 +35,9 @@ public class ProcessDataService {
                 contactsInformation.add(contactInformation);
             }
         } catch (IOException e) {
-            System.out.println("An error happened when trying to read from the file");
+            String errorDescription = "An error happened when trying to read from the file";
+            System.out.println(errorDescription);
+            throw new ErrorDetail(LocalDateTime.now(), "ERROR_READING_FILE", errorDescription);
         }
         return contactsInformation;
     }
@@ -48,7 +52,9 @@ public class ProcessDataService {
                     .map(data -> String.join(COMMA_SEPARATOR, data))
                     .forEach(pw::println);
         } catch (FileNotFoundException e){
-            System.out.println("The output file was not found: " + e);
+            String errorDescription = "The output file was not found ";
+            System.out.println(errorDescription);
+            throw new ErrorDetail(LocalDateTime.now(), "ERROR_SAVING_FILE", errorDescription);
         }
     }
 
