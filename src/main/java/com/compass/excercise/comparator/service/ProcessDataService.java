@@ -32,6 +32,7 @@ public class ProcessDataService {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] contactInformation = line.split(COMMA_SEPARATOR);
+
                 contactsInformation.add(contactInformation);
             }
         } catch (IOException e) {

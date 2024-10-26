@@ -42,8 +42,6 @@ public class ComparatorService {
     }
 
     private List<String[]> compareContactInformation(List<String[]> contactInformation) {
-
-        LevenshteinCalculator calculator = new LevenshteinCalculator();
         double result = 0;
 
         //This lines below defines the structure of the CSV we obtain as a result
@@ -62,19 +60,17 @@ public class ComparatorService {
                     in the CSV so if any of them (source or match) has null elements it will not be
                     considered
                 */
-                int valor = returnMinor(contactInformation.get(i).length,
-                                        contactInformation.get(j).length);
+                for (int k = 1; k < 6; k++) {
+                    String contactSourceValue = contactInformation.get(i).length <= k ? " " : contactInformation.get(i)[k];
 
-                for (int k = 1; k < valor; k++) {
-                    double partialResult = calculator.getDifference(contactInformation.get(i)[k],
-                                                                    contactInformation.get(j)[k]);
+                    String contactMatchValue = contactInformation.get(j).length <= k ? " " : contactInformation.get(j)[k];
 
-                    result += partialResult;
+                    result += obtainPartialResult(contactSourceValue, contactMatchValue);
                 }
 
 
-                comparatorResult.add(new String[]{ String.valueOf(i),
-                                                   String.valueOf(j),
+                comparatorResult.add(new String[]{ contactInformation.get(i)[0],
+                                                   contactInformation.get(j)[0],
                                                    String.valueOf(result),
                                                    defineAccuracy(result)});
                 //Initialize again the result
@@ -83,6 +79,19 @@ public class ComparatorService {
             }
         }
         return comparatorResult;
+    }
+
+    private double obtainPartialResult(String contactSourceValue, String contactMatchValue) {
+        LevenshteinCalculator calculator = new LevenshteinCalculator();
+
+        if(contactMatchValue.isEmpty())
+            contactMatchValue = " ";
+
+        if(contactSourceValue.isEmpty())
+            contactSourceValue = " ";
+
+        return calculator.getDifference(contactSourceValue,
+                                        contactMatchValue);
     }
 
     private String defineAccuracy(double resultComparator) {
@@ -96,13 +105,6 @@ public class ComparatorService {
             return "High";
         }
         return "Error";
-    }
-
-    private int returnMinor(int contactSourceSize, int contactMatchSize) {
-        if (contactSourceSize == contactMatchSize || contactSourceSize < contactMatchSize)
-            return contactSourceSize;
-
-        return contactMatchSize;
     }
 
 }
