@@ -40,12 +40,4 @@ class ProcessDataServiceTest {
 		Assertions.assertThatCode(() -> processDataService.convertContactComparatorIntoACSVFile(contactComparatorResult))
 				.doesNotThrowAnyException();
 	}
-
-	@Test
-	void convertComparatorIntoACSVShouldFail() {
-		List<String[]> contactComparatorResult = getContactComparatorResult();
-
-		Assertions.assertThatCode(() -> processDataService.convertContactComparatorIntoACSVFile(contactComparatorResult))
-				.doesNotThrowAnyException();
-	}
 }
